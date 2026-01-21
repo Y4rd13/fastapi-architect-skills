@@ -1,11 +1,12 @@
-# 🏗️ FastAPI Architect Skills
+# 🏗️ FastAPI Architect Skill (Codex CLI)
 
-A **Codex CLI skill** that helps you **scaffold, audit, and refactor** FastAPI services using **uv**, a clean **`src/` layout**, **versioned routers** (`/v1`, `/v2`), and **singleton external clients** under `src/services/clients`.
+A **Codex CLI skill** to **scaffold, audit, and refactor** FastAPI services using **uv**, a clean **`src/` layout**, **versioned routers** (`/v1`, `/v2`), and **optional singleton external clients** under `src/services/clients` **only when the project actually needs them**.
 
-- Opinionated, production-ready defaults
-- Minimal, essential English comments only
-- Built to keep endpoints thin and business logic in services
-- Designed for teams that want consistent project structure and quality gates
+* ✅ Opinionated, production-ready defaults
+* ✅ Minimal, essential English comments only
+* ✅ Thin endpoints, business logic in `src/services`
+* ✅ Consistent versioning + tags + naming conventions
+* ✅ Optional external clients (HTTP/DB/etc) with enforced singleton pattern
 
 ---
 
@@ -18,11 +19,14 @@ Generates a ready-to-run project with:
 * `uv` + `pyproject.toml`
 * `src/` package layout
 * API versioning (`/v1` ready)
+* **Project-relevant router naming** (no generic `v1_router`)
 * `pydantic-settings` configuration
-* Structured logging template
-* Singleton `httpx` client (`src/services/clients`)
+* Structured logging templates
 * Health endpoint + test
 * Dockerfile built around `uv`
+
+✅ **External clients are NOT created by default.**
+If your service needs an external client (HTTP APIs, DB, Redis, etc.), you opt in (see usage).
 
 ### 🔍 Audit an existing FastAPI service
 
@@ -30,7 +34,8 @@ Produces an **objective, numbered plan** with:
 
 * Missing files/folders vs the blueprint
 * Router versioning checks (`/v1`, `/v2`)
-* Singleton client heuristics (`src/services/clients`)
+* **Project-relevant router alias + tags recommendations**
+* External clients checks **only if client usage is detected**
 * Final quality-gate recommendations (lint + tests)
 
 ---
@@ -50,20 +55,24 @@ fastapi-architect/
 │  └─ uv_notes.md
 └─ assets/
    └─ templates/
-      ├─ pyproject.toml.tmpl
       ├─ Dockerfile.tmpl
       ├─ README.md.tmpl
       ├─ env.example.tmpl
       ├─ python-version.tmpl
-      ├─ src_main.py.tmpl
+      ├─ pyproject_no_clients.tmpl
+      ├─ pyproject_with_httpx.tmpl
+      ├─ src_main_no_clients.py.tmpl
+      ├─ src_main_with_httpx.py.tmpl
       ├─ src_core_config.py.tmpl
       ├─ src_core_log_config.py.tmpl
       ├─ src_core_logger_func.py.tmpl
       ├─ src_core_errors.py.tmpl
-      ├─ src_api_deps.py.tmpl
+      ├─ src_api_deps_no_clients.py.tmpl
+      ├─ src_api_deps_with_httpx.py.tmpl
       ├─ src_api_v1_router.py.tmpl
       ├─ src_api_v1_health.py.tmpl
       ├─ src_services_clients_httpx.py.tmpl
+      ├─ tests_conftest.py.tmpl
       └─ tests_test_health.py.tmpl
 ```
 
@@ -71,7 +80,7 @@ fastapi-architect/
 
 ## ✅ Output project structure (scaffold result)
 
-When you scaffold a project, you get:
+### Default scaffold (no external clients)
 
 ```
 <project>/
@@ -82,36 +91,46 @@ When you scaffold a project, you get:
 ├─ .env.example
 ├─ src/
 │  ├─ __init__.py
-│  ├─ main.py                       # FastAPI entrypoint (includes /v1, /v2 routers here)
+│  ├─ main.py                       # includes /v1 routers with project-relevant alias + tags
 │  ├─ core/
 │  │  ├─ __init__.py
-│  │  ├─ config.py                  # Settings (pydantic-settings)
-│  │  ├─ log_config.py              # Logging config
-│  │  ├─ logger_func.py             # Logger init
-│  │  └─ errors.py                  # Minimal app-level exceptions
+│  │  ├─ config.py
+│  │  ├─ log_config.py
+│  │  ├─ logger_func.py
+│  │  └─ errors.py
 │  ├─ api/
 │  │  ├─ __init__.py
-│  │  ├─ deps.py                    # Shared dependencies
+│  │  ├─ deps.py
 │  │  ├─ v1/
 │  │  │  ├─ __init__.py
-│  │  │  ├─ router.py               # v1 router aggregator
+│  │  │  ├─ router.py
 │  │  │  └─ endpoints/
 │  │  │     ├─ __init__.py
 │  │  │     └─ health.py            # /v1/health
 │  │  └─ v2/
-│  │     └─ __init__.py             # (placeholder by default)
+│  │     └─ __init__.py             # placeholder by default
 │  ├─ schemas/
 │  │  └─ __init__.py
 │  ├─ services/
-│  │  ├─ __init__.py
-│  │  └─ clients/
-│  │     ├─ __init__.py
-│  │     └─ httpx_client.py         # singleton factory
+│  │  └─ __init__.py
 │  └─ utils/
 │     └─ __init__.py
 └─ tests/
    ├─ __init__.py
+   ├─ conftest.py                   # ensures src/ is importable in tests
    └─ test_health.py
+```
+
+### Scaffold with HTTP client (optional)
+
+If you scaffold with `--with-http-client`, it additionally creates:
+
+```
+src/
+└─ services/
+   └─ clients/
+      ├─ __init__.py
+      └─ httpx_client.py            # singleton factory (e.g., @lru_cache)
 ```
 
 📌 Note: `/v2` is created as a placeholder directory by default. If you want `/v2` fully scaffolded (router + endpoints + include in `main.py`), add templates and update the scaffold script accordingly.
@@ -145,9 +164,9 @@ When you scaffold a project, you get:
 
 ## 🚀 Usage
 
-### 🧱 Scaffold a new FastAPI service
+### 🧱 Scaffold a new FastAPI service (default: no clients)
 
-Run the scaffold script with `uv`:
+Run with `uv`:
 
 * `uv run python scripts/scaffold_fastapi_uv.py --project-dir <path> --service-name <name> --app-title "<title>"`
 
@@ -162,6 +181,18 @@ Then inside the generated project:
 * `uv run task test`
 * `uv run uvicorn main:app --host 0.0.0.0 --port 8000 --app-dir src`
 
+### 🌐 Scaffold with an HTTP client (only if needed)
+
+Use this when your service calls external APIs:
+
+* `uv run python scripts/scaffold_fastapi_uv.py --project-dir <path> --service-name <name> --app-title "<title>" --with-http-client`
+
+This adds:
+
+* `src/services/clients/httpx_client.py` (singleton)
+* `httpx` dependency
+* lifespan wiring in `src/main.py` to close the client cleanly
+
 ### 🔍 Audit an existing FastAPI project
 
 * `uv run python scripts/audit_fastapi_project.py --project-dir <path>`
@@ -169,6 +200,8 @@ Then inside the generated project:
 Example:
 
 * `uv run python scripts/audit_fastapi_project.py --project-dir .`
+
+✅ The audit will **only enforce clients rules** if it detects client usage (dependencies/imports) or the `src/services/clients` folder already exists.
 
 ---
 
@@ -178,15 +211,22 @@ Example:
 
 * Routers must be included via `prefix="/v1"` (and optionally `/v2`) in `src/main.py`.
 
+✅ **Project-relevant router naming + tags**
+
+* Avoid generic names like `v1_router`.
+* Prefer `<service>_router` and tags aligned with the service/domain, e.g.:
+
+  * `app.include_router(my_service_router, prefix="/v1", tags=["my_service"])`
+
 ✅ **Thin endpoints**
 
 * Endpoints should be minimal orchestration.
 * Business logic goes into `src/services/`.
 
-✅ **Singleton external clients**
+✅ **External clients are optional**
 
-* External clients live in `src/services/clients/`.
-* Always use a singleton factory (default uses `@lru_cache`).
+* Create `src/services/clients/` only if the project actually needs it.
+* If clients exist, enforce the singleton pattern (default uses `@lru_cache`).
 * Close clients via FastAPI `lifespan`.
 
 ✅ **Utilities in `src/utils`**
