@@ -255,9 +255,3 @@ PRs are welcome! Suggested contribution flow:
 2. Keep diffs small and focused
 3. Update templates + scripts together
 4. Add/adjust tests if you change generated behavior
-
----
-
-## 📜 License
-
-Pick a license (MIT is a common default) and add it as `LICENSE` in the repo.
