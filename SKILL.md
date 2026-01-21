@@ -26,6 +26,7 @@ Use this skill when the user asks to:
 5. When external clients exist, `src/services/clients/*` **must use a singleton pattern**.
 6. Utilities (small helpers) go in `src/utils/`.
 7. Comments are **only the essentials** and **in English**.
+8. After any major change, always run `uv run task lint_fix` as the final step.
 
 ## Workflow
 ### A) If the user does NOT have a project yet (scaffold)
@@ -39,6 +40,8 @@ Use this skill when the user asks to:
    - `uv run task test`
 4. Run locally:
    - `uv run uvicorn main:app --host 0.0.0.0 --port 8000 --app-dir src`
+5. If any major changes are applied during setup, run:
+   - `uv run task lint_fix` (final step)
 
 ### B) If the user ALREADY has a project (audit + plan + refactor)
 1. Run:
@@ -53,7 +56,7 @@ Use this skill when the user asks to:
    - Update imports
    - Ensure `/v1` routing works with a project-relevant router alias and tags
 4. Finish with quality gates:
-   - `uv run task lint_fix`
+   - `uv run task lint_fix` (required final step after major changes)
    - `uv run task test`
 
 ## Singleton clients (only when needed)

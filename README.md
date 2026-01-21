@@ -181,6 +181,10 @@ Then inside the generated project:
 * `uv run task test`
 * `uv run uvicorn main:app --host 0.0.0.0 --port 8000 --app-dir src`
 
+✅ After any major change (refactor, routing, dependencies, clients, settings), always finish with:
+- `uv run task lint_fix`
+
+
 ### 🌐 Scaffold with an HTTP client (only if needed)
 
 Use this when your service calls external APIs:
@@ -244,17 +248,16 @@ Example:
 
 The scaffolded project includes Taskipy tasks:
 
-* Lint & type-check:
+- Lint & type-check:
+  - `uv run task lint`
 
-  * `uv run task lint`
+- Auto-fix (required after major changes):
+  - `uv run task lint_fix`
 
-* Auto-fix:
+- Tests:
+  - `uv run task test`
 
-  * `uv run task lint_fix`
-
-* Tests:
-
-  * `uv run task test`
+✅ Rule: After any major change (structure, routers, deps, clients, settings), always run `uv run task lint_fix` as the final step.
 
 ---
 
