@@ -4,6 +4,16 @@ A **multi-skill repository** for **Codex CLI** and **Claude Code**: reusable, ta
 
 ---
 
+## 🧩 Skills overview
+
+Each skill is a self-contained, task-focused workflow that instructs agents how to act in a specific domain.
+
+* **fastapi-architect**: Scaffolds, reviews, or refactors FastAPI services using uv, a `src/` layout, versioned routers, and optional singleton external clients.
+* **python-best-practices**: Applies production-grade Python standards for `src/` structure, typing, docs, tests, uv+taskipy+ruff tooling, CI gates, security, and performance.
+* **mlops-blueprints**: Generates MLOps blueprints and operational patterns for ML systems.
+* **llm-evals-toolkit**: Builds LLM evaluation workflows and experiment hygiene guidance.
+* **repo-codebook-generator**: Produces a versioned repository codebook artifact (structure, one-line file descriptions, and full source) while respecting `.gitignore` and excluding non-source artifacts.
+
 ## 🧱 Skill structure
 
 This repository is organized as a **skill catalog** under `./skills/`, where each folder is a standalone skill:
@@ -18,11 +28,16 @@ fullstack-ml-ai-agent-skills/
    │  └─ references/     
    ├─ python-best-practices/
    │  └─ SKILL.md
+   ├─ repo-codebook-generator/
+   │  ├─ SKILL.md
+   │  ├─ scripts/
+   │  ├─ assets/
+   │  └─ references/
    ├─ mlops-blueprints/
    │  └─ SKILL.md
    └─ llm-evals-toolkit/
       └─ SKILL.md
-````
+```
 
 ---
 
