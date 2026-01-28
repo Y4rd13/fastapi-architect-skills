@@ -57,6 +57,8 @@ DEFAULT_MAX_TEXT_FILE_BYTES = 512 * 1024  # 512 KB
 
 _VERSION_RE = re.compile(r"^- codebook_version:\s*([0-9]+)\.([0-9]+)\.([0-9]+)\s*$", re.MULTILINE)
 
+_VERSION_RE = re.compile(r"^- codebook_version:\s*([0-9]+)\.([0-9]+)\.([0-9]+)\s*$", re.MULTILINE)
+
 
 @dataclass(frozen=True)
 class ProjectInfo:
@@ -424,6 +426,26 @@ def _apply_config_mutations(cfg: CodebookConfig, args: argparse.Namespace) -> Co
         max_text_file_bytes=max_bytes,
         notes=cfg.notes,
     )
+
+
+def _render_code_blocks(paths: list[Path]) -> str:
+    blocks: list[str] = []
+
+    for rel in paths:
+        abs_path = _REPO_ROOT / rel
+
+        if _is_effectively_empty(abs_path):
+            continue
+
+        if _is_binary_or_too_large(abs_path):
+            blocks.append(f"- `{rel.as_posix()}`: skipped (binary or too large)\n")
+            continue
+
+        content = abs_path.read_text(encoding="utf-8")
+        fence = f"```{rel.as_posix()}".rstrip()
+        blocks.append(f"{fence}\n{content}\n```\n")
+
+    return "\n".join(blocks).rstrip()
 
 
 def main() -> int:
